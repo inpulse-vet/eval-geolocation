@@ -13,6 +13,8 @@ class KtorClientTest {
 
     @Test
     fun `test list restaurants`(): Unit = runBlocking {
-        client.listRestaurants(Location(Latitude(33f), Longitude(33f)), 10, 1f)
+        val restaurants = client.listRestaurants(Location(Latitude(33f), Longitude(33f)), 10, 1f)
+        assert(restaurants.isSuccess)
+        assert(restaurants.getOrThrow().isNotEmpty())
     }
 }
