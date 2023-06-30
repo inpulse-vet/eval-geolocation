@@ -12,3 +12,6 @@ buildscript {
 include(":model")
 include(":client")
 include(":ktor-client")
+include(":server")
+include(":ktor-server")
+

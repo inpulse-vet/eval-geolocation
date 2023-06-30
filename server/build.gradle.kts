@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "1.8.10"
     kotlin("plugin.serialization") version "1.8.10"
+    java
 }
 
 kotlin {
@@ -12,11 +13,7 @@ tasks.test {
 }
 
 dependencies {
-    val ktorVersion = "2.3.1"
-
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
-
+    api(project(":model"))
     testImplementation(kotlin("test"))
 }
 

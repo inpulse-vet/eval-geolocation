@@ -95,6 +95,9 @@ class KtorClientApiImpl(
         return suspendResultOf {
             val response = client.post(url) {
                 contentType(ContentType.Application.Json)
+/*
+                basicAuth("username", "password")
+*/
                 setBody(restaurantDetails)
             }
             when (response.status) {
