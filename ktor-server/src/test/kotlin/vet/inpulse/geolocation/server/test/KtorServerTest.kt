@@ -26,9 +26,6 @@ import vet.inpulse.geolocation.server.configureAuthentication
 import vet.inpulse.geolocation.server.configureRouting
 import vet.inpulse.geolocation.server.configureSerialization
 import vet.inpulse.geolocation.server.database.DatabaseFactory
-import vet.inpulse.geolocation.server.repository.RestaurantServiceImpl
-import vet.inpulse.geolocation.server.service.RestaurantRepositoryImpl
-import vet.inpulse.server.RestaurantService
 import java.util.Base64
 import java.util.UUID
 import kotlin.test.assertNotNull
@@ -37,7 +34,8 @@ import kotlin.test.assertNotNull
 class KtorServerTest {
 
     companion object {
-        val postgresSQLContainer = PostgreSQLContainer(DockerImageName.parse("postgres:15.3"))
+        val postgresSQLContainer = PostgreSQLContainer<Nothing>(DockerImageName.parse("postgis/postgis:13-3.1")
+            .asCompatibleSubstituteFor("postgres"))
             .apply {
                 withDatabaseName("testDb")
                 withUsername("testUser")
@@ -59,7 +57,6 @@ class KtorServerTest {
         }
     }
 
-    private var service: RestaurantService? = null
     private lateinit var engine: TestApplicationEngine
 
     @BeforeEach
@@ -67,14 +64,14 @@ class KtorServerTest {
         postgresSQLContainer.apply {
             DatabaseFactory.init(jdbcUrl, username, password)
         }
-        this.service = RestaurantServiceImpl(RestaurantRepositoryImpl())
-
         engine = TestApplicationEngine()
         engine.start(wait = false)
 
-        engine.application.configureSerialization()
-        engine.application.configureAuthentication()
-        engine.application.configureRouting(service!!)
+        engine.application.apply {
+            configureSerialization()
+            configureAuthentication()
+            configureRouting()
+        }
     }
 
     @AfterEach

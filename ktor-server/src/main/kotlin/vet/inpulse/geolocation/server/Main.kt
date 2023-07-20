@@ -25,13 +25,10 @@ fun main() {
 }
 
 fun Application.module() {
-    val repository: RestaurantRepository = RestaurantRepositoryImpl()
-    val service: RestaurantService = RestaurantServiceImpl(repository)
-
     configureStatusPages()
     configureAuthentication()
     configureSerialization()
-    configureRouting(service)
+    configureRouting()
 }
 
 fun Application.configureStatusPages() =
@@ -64,7 +61,9 @@ fun Application.configureAuthentication() {
     }
 }
 
-fun Application.configureRouting(restaurantService: RestaurantService) {
+fun Application.configureRouting() {
+    val restaurantService = RestaurantServiceImpl(RestaurantRepositoryImpl())
+
     routing {
         get("/restaurants") {
             val parameters = call.parameters
