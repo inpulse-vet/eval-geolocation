@@ -4,17 +4,16 @@ import kotlinx.datetime.LocalTime
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
-import org.jetbrains.exposed.sql.selectBatched
 import org.jetbrains.exposed.sql.statements.InsertStatement
 import vet.inpulse.geolocation.*
 import vet.inpulse.geolocation.server.database.DatabaseFactory.query
 import vet.inpulse.geolocation.server.database.RestaurantTable
-import vet.inpulse.server.RestaurantService
+import vet.inpulse.server.RestaurantRepository
 import java.util.*
 
 import kotlin.math.*
 
-class RestaurantServiceImpl : RestaurantService {
+class RestaurantRepositoryImpl : RestaurantRepository {
 
     override suspend fun addNewRestaurant(restaurantDetails: RestaurantDetails): Boolean {
         var statement: InsertStatement<Number>? = null;
@@ -108,8 +107,6 @@ class RestaurantServiceImpl : RestaurantService {
         }
         return list
     }
-
-
 
     /*
         Fórmula de Haversine

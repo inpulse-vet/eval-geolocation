@@ -1,18 +1,15 @@
 package vet.inpulse.server
 
-import vet.inpulse.geolocation.ApplicationException
 import vet.inpulse.geolocation.Location
 import vet.inpulse.geolocation.Restaurant
 import vet.inpulse.geolocation.RestaurantDetails
+import java.util.*
 
 interface RestaurantRepository {
 
-    @Throws(ApplicationException::class)
-    suspend fun addRestaurant(restaurantDetails: RestaurantDetails)
+    suspend fun addNewRestaurant(restaurantDetails: RestaurantDetails): Boolean
 
-    @Throws(ApplicationException::class)
-    suspend fun getRestaurantDetails(restaurantId: String): RestaurantDetails?
+    suspend fun getRestaurantDetails(restaurantId: UUID): RestaurantDetails?
 
-    @Throws(ApplicationException::class)
     suspend fun getNearbyRestaurants(location: Location, batch: Int, maximumDistance: Double?): List<Restaurant>
 }

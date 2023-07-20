@@ -1,6 +1,5 @@
 package vet.inpulse.geolocation
 
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import vet.inpulse.geolocation.serialize.UUIDSerializer
 import java.util.UUID

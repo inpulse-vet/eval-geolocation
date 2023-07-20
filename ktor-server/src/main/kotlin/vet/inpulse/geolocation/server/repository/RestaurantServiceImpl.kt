@@ -6,16 +6,16 @@ import vet.inpulse.server.RestaurantService
 import java.lang.IllegalArgumentException
 import java.util.*
 
-class RestaurantRepositoryImpl(
-    private val restaurantService: RestaurantService
-): RestaurantRepository {
+class RestaurantServiceImpl(
+    private val restaurantRepository: RestaurantRepository
+): RestaurantService {
 
     @Throws(ApplicationException::class)
     override suspend fun addRestaurant(restaurantDetails: RestaurantDetails) {
         if (restaurantDetails.name.isEmpty() or restaurantDetails.streetAddress.isEmpty()) {
             throw ApplicationException(error = Error.MALFORMED_DATA)
         }
-        restaurantService.addNewRestaurant(restaurantDetails)
+        restaurantRepository.addNewRestaurant(restaurantDetails)
     }
 
     @Throws(ApplicationException::class)
@@ -28,7 +28,7 @@ class RestaurantRepositoryImpl(
             throw ApplicationException(Error.INVALID_ID, exception)
         }
 
-        return restaurantService.getRestaurantDetails(id)
+        return restaurantRepository.getRestaurantDetails(id)
     }
 
     @Throws(ApplicationException::class)
@@ -37,11 +37,10 @@ class RestaurantRepositoryImpl(
     ): List<Restaurant> {
         var list: List<Restaurant>
         try {
-            list = restaurantService.getNearbyRestaurants(location, batch, maximumDistance)
+            list = restaurantRepository.getNearbyRestaurants(location, batch, maximumDistance)
         } catch (exception: IllegalArgumentException) {
             throw ApplicationException(Error.MALFORMED_INPUT)
         }
         return list
     }
-
 }
