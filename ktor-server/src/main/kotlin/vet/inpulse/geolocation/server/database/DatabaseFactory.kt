@@ -10,27 +10,26 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 object DatabaseFactory {
 
-    fun init() {
-        Database.connect(hikariConfiguration())
+    fun init(jdbcUrl: String, username: String, password: String): Database {
+        val database = Database.connect(hikariConfiguration(jdbcUrl, username, password))
 
         transaction {
             SchemaUtils.create(RestaurantTable)
         }
+        return database;
     }
 
-    private fun hikariConfiguration(): HikariDataSource {
-        val config = HikariConfig()
+    private fun hikariConfiguration(jdbcUrl: String, username: String, password: String): HikariDataSource {
+        val config = HikariConfig().apply {
+            this.driverClassName = "org.postgresql.Driver"
+            this.jdbcUrl = jdbcUrl
+            this.username = username
+            this.password = password
 
-        // switch to environment variables
-        config.driverClassName = "org.postgresql.Driver"
-        config.jdbcUrl = "jdbc:postgresql://localhost:5432/geolocation"
-
-        config.username = "mathews"
-        config.password = "1234"
-
-        config.maximumPoolSize = 3
-        config.isAutoCommit = false
-        config.transactionIsolation = "TRANSACTION_REPEATABLE_READ"
+            maximumPoolSize = 3
+            isAutoCommit = false
+            transactionIsolation = "TRANSACTION_REPEATABLE_READ"
+        }
 
         config.validate()
         return HikariDataSource(config)
