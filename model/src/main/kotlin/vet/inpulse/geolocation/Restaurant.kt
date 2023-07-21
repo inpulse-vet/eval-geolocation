@@ -9,7 +9,8 @@ import java.util.UUID
  */
 @Serializable
 data class Restaurant(
-    @Serializable(with = UUIDSerializer::class) val id: UUID,
+    @Serializable(with = UUIDSerializer::class)
+    val id: UUID,
     val name: String,
     val location: Location
 )
