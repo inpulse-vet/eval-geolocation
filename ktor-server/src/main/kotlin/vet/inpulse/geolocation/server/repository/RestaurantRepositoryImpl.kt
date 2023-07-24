@@ -59,7 +59,8 @@ class RestaurantRepositoryImpl : RestaurantRepository {
         val point = Point(location.longitude.value.toDouble(), location.latitude.value.toDouble())
 
         return newSuspendedTransaction {
-            RestaurantTable.select(DistanceOp(RestaurantTable.location, point, maximumDistance ?: 1000.0))
+            RestaurantTable.slice(RestaurantTable.id, RestaurantTable.name, RestaurantTable.location)
+                  .select(DistanceOp(RestaurantTable.location, point, maximumDistance ?: 1000.0))
                   .limit(batch)
                   .mapNotNull { it.toRestaurant() }
                   .toList()
