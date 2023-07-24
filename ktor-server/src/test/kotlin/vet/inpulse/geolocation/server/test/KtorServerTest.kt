@@ -101,8 +101,9 @@ class KtorServerTest {
             setBody(Json.encodeToJsonElement(restaurantDetails).toString())
         }
 
-        assertNotNull(call.response.status())
-        assert(call.response.status()!!.isSuccess())
+        val status = call.response.status()
+        assertNotNull(status)
+        assert(status.isSuccess())
     }
 
     @Test

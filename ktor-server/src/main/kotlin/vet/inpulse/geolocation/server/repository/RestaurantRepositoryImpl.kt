@@ -17,27 +17,24 @@ class RestaurantRepositoryImpl : RestaurantRepository {
               restaurantDetails.location.latitude.value.toDouble(),
               restaurantDetails.location.longitude.value.toDouble()
         )
+        return runCatching {
+            newSuspendedTransaction {
+                RestaurantTable.insert {
+                    it[id] = restaurantDetails.id
+                    it[name] = restaurantDetails.name
+                    it[location] = point
+                    it[streetAddress] = restaurantDetails.streetAddress
+                    it[phone] = restaurantDetails.phone
+                    it[website] = restaurantDetails.website
 
-        newSuspendedTransaction {
-            RestaurantTable.insert { it ->
-                it[id] = restaurantDetails.id
-                it[name] = restaurantDetails.name
-                it[location] = point
-                it[streetAddress] = restaurantDetails.streetAddress
-                it[phone] = restaurantDetails.phone
-                it[website] = restaurantDetails.website
-
-                restaurantDetails.openHours?.let { openHours ->
-                    it[openingTime] = openHours.openingTime.toString()
-                    it[closingTime] = openHours.closingTime.toString()
+                    restaurantDetails.openHours?.let { openHours ->
+                        it[openingTime] = openHours.openingTime.toString()
+                        it[closingTime] = openHours.closingTime.toString()
+                    }
                 }
             }
-        }
-
-        return true
+        }.isSuccess
     }
-
-
     override suspend fun getRestaurantDetails(restaurantId: UUID): RestaurantDetails? {
         return newSuspendedTransaction {
             RestaurantTable.select {
@@ -58,14 +55,12 @@ class RestaurantRepositoryImpl : RestaurantRepository {
         }
     }
 
-
     override suspend fun getNearbyRestaurants(location: Location, batch: Int, maximumDistance: Double?): List<Restaurant> {
         val point = Point(location.longitude.value.toDouble(), location.latitude.value.toDouble())
 
         return newSuspendedTransaction {
-            RestaurantTable.selectAll()
+            RestaurantTable.select(DistanceOp(RestaurantTable.location, point, maximumDistance ?: 1000.0))
                   .limit(batch)
-                  .andWhere { DistanceOp(RestaurantTable.location, point, maximumDistance ?: 1000.0) }
                   .mapNotNull { it.toRestaurant() }
                   .toList()
         }
