@@ -5,24 +5,23 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.postgis.Point
 import vet.inpulse.geolocation.*
-import vet.inpulse.geolocation.server.database.DistanceOp
 import vet.inpulse.geolocation.server.database.RestaurantTable
+import vet.inpulse.geolocation.server.database.distance
 import vet.inpulse.server.RestaurantRepository
 import java.util.*
 
 class RestaurantRepositoryImpl : RestaurantRepository {
 
     override suspend fun addNewRestaurant(restaurantDetails: RestaurantDetails): Boolean {
-        val point = Point(
-              restaurantDetails.location.latitude.value.toDouble(),
-              restaurantDetails.location.longitude.value.toDouble()
-        )
         return runCatching {
             newSuspendedTransaction {
                 RestaurantTable.insert {
                     it[id] = restaurantDetails.id
                     it[name] = restaurantDetails.name
-                    it[location] = point
+                    it[location] = Point(
+                          restaurantDetails.location.latitude.value.toDouble(),
+                          restaurantDetails.location.longitude.value.toDouble()
+                    )
                     it[streetAddress] = restaurantDetails.streetAddress
                     it[phone] = restaurantDetails.phone
                     it[website] = restaurantDetails.website
@@ -60,10 +59,9 @@ class RestaurantRepositoryImpl : RestaurantRepository {
 
         return newSuspendedTransaction {
             RestaurantTable.slice(RestaurantTable.id, RestaurantTable.name, RestaurantTable.location)
-                  .select(DistanceOp(RestaurantTable.location, point, maximumDistance ?: 1000.0))
+                  .select(RestaurantTable.location.distance(point, maximumDistance ?: 1000.0))
                   .limit(batch)
                   .mapNotNull { it.toRestaurant() }
-                  .toList()
         }
     }
 

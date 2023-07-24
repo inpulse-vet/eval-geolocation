@@ -100,8 +100,6 @@ fun Application.configureRouting() {
         authenticate("auth-basic") {
             post("/restaurants") {
                 val principal = call.principal<PrincipalAuthentication>()
-                application.log.info(principal.toString())
-
                 if (principal == null) {
                     call.respond(HttpStatusCode.Unauthorized)
                     return@post

@@ -37,6 +37,9 @@ class PointColumnType(private val srid: Int = 4326) : ColumnType() {
     }
 }
 
+fun Column<Point>.distance(point2: Point, maxDistanceKm: Double): Op<Boolean> =
+      DistanceOp(this, point2, maxDistanceKm)
+
 class DistanceOp(
       private val point1: Column<Point>,
       private val point2: Point,
