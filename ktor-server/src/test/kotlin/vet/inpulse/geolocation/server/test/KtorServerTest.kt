@@ -1,6 +1,5 @@
 package vet.inpulse.geolocation.server.test
 
-import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
@@ -12,7 +11,6 @@ import io.ktor.server.testing.*
 import kotlinx.datetime.LocalTime
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
-import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
@@ -40,12 +38,12 @@ class KtorServerTest {
         private val logger = LoggerFactory.getLogger(KtorServerTest::class.java)
 
         val postgresSQLContainer = PostgreSQLContainer<Nothing>(DockerImageName.parse("postgis/postgis:13-3.1")
-            .asCompatibleSubstituteFor("postgres"))
-            .apply {
-                withDatabaseName("testDb")
-                withUsername("testUser")
-                withPassword("testPassword")
-            }
+              .asCompatibleSubstituteFor("postgres"))
+              .apply {
+                  withDatabaseName("testDb")
+                  withUsername("testUser")
+                  withPassword("testPassword")
+              }
 
         val randomId: UUID = UUID.randomUUID()
 
@@ -86,18 +84,18 @@ class KtorServerTest {
     }
 
     @Test
-    fun testAddRestaurant() {
+    fun insertRestaurant() {
         val restaurantDetails = RestaurantDetails(
-            randomId, "Test Restaurant",
-            Location(Latitude(34F), Longitude(34F)),
-            "Test Street Address", "Test Phone", "Test Website",
-            OpenHours(LocalTime(1, 0), LocalTime(5, 0))
+              randomId, "Test Restaurant",
+              Location(Latitude(34F), Longitude(34F)),
+              "Test Street Address", "Test Phone", "Test Website",
+              OpenHours(LocalTime(1, 0), LocalTime(5, 0))
         )
 
         val call = engine.handleRequest(HttpMethod.Post, "/restaurants") {
             addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             addHeader(HttpHeaders.Authorization,
-                "Basic ${Base64.getEncoder().encodeToString("user:password".toByteArray())}")
+                  "Basic ${Base64.getEncoder().encodeToString("user:password".toByteArray())}")
             setBody(Json.encodeToJsonElement(restaurantDetails).toString())
         }
 
