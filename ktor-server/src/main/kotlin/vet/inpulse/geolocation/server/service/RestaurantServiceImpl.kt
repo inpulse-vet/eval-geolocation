@@ -1,4 +1,4 @@
-package vet.inpulse.geolocation.server.repository
+package vet.inpulse.geolocation.server.service
 
 import vet.inpulse.geolocation.*
 import vet.inpulse.server.RestaurantRepository

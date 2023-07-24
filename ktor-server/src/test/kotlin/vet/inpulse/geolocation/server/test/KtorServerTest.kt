@@ -12,12 +12,14 @@ import io.ktor.server.testing.*
 import kotlinx.datetime.LocalTime
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
+import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.slf4j.LoggerFactory
 
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.DockerImageName
@@ -25,6 +27,7 @@ import vet.inpulse.geolocation.*
 import vet.inpulse.geolocation.server.configureAuthentication
 import vet.inpulse.geolocation.server.configureRouting
 import vet.inpulse.geolocation.server.configureSerialization
+import vet.inpulse.geolocation.server.database.DatabaseConfig
 import vet.inpulse.geolocation.server.database.DatabaseFactory
 import java.util.Base64
 import java.util.UUID
@@ -34,6 +37,8 @@ import kotlin.test.assertNotNull
 class KtorServerTest {
 
     companion object {
+        private val logger = LoggerFactory.getLogger(KtorServerTest::class.java)
+
         val postgresSQLContainer = PostgreSQLContainer<Nothing>(DockerImageName.parse("postgis/postgis:13-3.1")
             .asCompatibleSubstituteFor("postgres"))
             .apply {
@@ -62,8 +67,9 @@ class KtorServerTest {
     @BeforeEach
     fun setUp() {
         postgresSQLContainer.apply {
-            DatabaseFactory.init(jdbcUrl, username, password)
+            DatabaseFactory.init(DatabaseConfig(jdbcUrl, username, password))
         }
+
         engine = TestApplicationEngine()
         engine.start(wait = false)
 
@@ -83,7 +89,7 @@ class KtorServerTest {
     fun testAddRestaurant() {
         val restaurantDetails = RestaurantDetails(
             randomId, "Test Restaurant",
-            Location(Latitude(70F), Longitude(80F)),
+            Location(Latitude(34F), Longitude(34F)),
             "Test Street Address", "Test Phone", "Test Website",
             OpenHours(LocalTime(1, 0), LocalTime(5, 0))
         )
@@ -95,15 +101,30 @@ class KtorServerTest {
             setBody(Json.encodeToJsonElement(restaurantDetails).toString())
         }
 
-        assertNotNull(call.response.status())
-        assert(call.response.status()!!.isSuccess())
+        val status = call.response.status()
+        assertNotNull(status)
+        assert(status.isSuccess())
     }
 
     @Test
     fun getRestaurantDetails() {
         val call = engine.handleRequest(HttpMethod.Get, "/restaurants/$randomId")
+        val status = call.response.status()
 
-        assertNotNull(call.response.status())
-        assert(call.response.status()!!.isSuccess())
+        assertNotNull(status)
+        assert(status.isSuccess())
+
+        logger.info(call.response.content)
+    }
+
+    @Test
+    fun getNearbyRestaurants() {
+        val call = engine.handleRequest(HttpMethod.Get, "/restaurants?lat=34&long=34&n=10&distance=100")
+        val status = call.response.status()
+
+        assertNotNull(status)
+        assert(status.isSuccess())
+
+        logger.info(call.response.content)
     }
 }

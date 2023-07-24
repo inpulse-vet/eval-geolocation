@@ -36,6 +36,8 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
 
     implementation("org.postgresql:postgresql:42.6.0")
+    implementation("net.postgis:postgis-jdbc:2.2.0")
+
     implementation("com.zaxxer:HikariCP:5.0.1")
 
     testImplementation("org.testcontainers:postgresql:1.17.6")
