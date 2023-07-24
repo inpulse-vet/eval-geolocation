@@ -1,8 +1,12 @@
 plugins {
     kotlin("jvm") version "1.8.10"
     kotlin("plugin.serialization") version "1.8.10"
+    id("com.google.cloud.tools.jib") version "3.3.2"
     java
 }
+
+group = "vet.inpulse.geolocation"
+version = "0.0.1"
 
 kotlin {
     jvmToolchain(17)
@@ -40,10 +44,20 @@ dependencies {
 
     implementation("com.zaxxer:HikariCP:5.0.1")
 
+    // testing
     testImplementation("org.testcontainers:postgresql:1.17.6")
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
-    testImplementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
 
     testImplementation(kotlin("test"))
 }
 
+jib {
+    to {
+        // set image, tag and registry
+
+        auth {
+            username = project.findProperty("nexus_username") as String
+            password = project.findProperty("nexus_password") as String
+        }
+    }
+}
