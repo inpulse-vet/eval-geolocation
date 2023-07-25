@@ -21,7 +21,7 @@ import vet.inpulse.geolocation.server.service.RestaurantServiceImpl
 import vet.inpulse.geolocation.server.repository.RestaurantRepositoryImpl
 
 fun main() {
-    embeddedServer(Netty, port = 8081, host = "localhost", module = Application::module).start(wait = true)
+    embeddedServer(Netty, port = 8081, host = "0.0.0.0", module = Application::module).start(wait = true)
 }
 
 fun Application.module() {
