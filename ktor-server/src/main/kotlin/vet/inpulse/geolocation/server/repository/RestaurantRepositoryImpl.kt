@@ -34,6 +34,7 @@ class RestaurantRepositoryImpl : RestaurantRepository {
             }
         }.isSuccess
     }
+
     override suspend fun getRestaurantDetails(restaurantId: UUID): RestaurantDetails? {
         return newSuspendedTransaction {
             RestaurantTable.select {

@@ -52,12 +52,16 @@ dependencies {
 }
 
 jib {
-    to {
-        // set image, tag and registry
+    from {
+        image = "openjdk:17-alpine"
+    }
 
-        auth {
-            username = project.findProperty("nexus_username") as String
-            password = project.findProperty("nexus_password") as String
-        }
+    to {
+        image = "vet-inpulse/eval-geolocation"
+        tags = setOf("latest")
+    }
+
+    container {
+        mainClass = "vet.inpulse.geolocation.server.MainKt"
     }
 }

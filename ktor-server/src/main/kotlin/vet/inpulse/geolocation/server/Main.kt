@@ -15,6 +15,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import vet.inpulse.geolocation.*
 import vet.inpulse.geolocation.server.data.PrincipalAuthentication
+import vet.inpulse.geolocation.server.database.DatabaseConfig
 import vet.inpulse.geolocation.server.database.DatabaseFactory
 import vet.inpulse.geolocation.server.service.RestaurantServiceImpl
 import vet.inpulse.geolocation.server.repository.RestaurantRepositoryImpl
@@ -24,7 +25,13 @@ fun main() {
 }
 
 fun Application.module() {
-    DatabaseFactory.init()
+    DatabaseFactory.init(
+          DatabaseConfig(
+                System.getenv("POSTGRES_URL"),
+                System.getenv("POSTGRES_USER"),
+                System.getenv("POSTGRES_PASSWORD")
+          )
+    )
 
     configureStatusPages()
     configureAuthentication()
