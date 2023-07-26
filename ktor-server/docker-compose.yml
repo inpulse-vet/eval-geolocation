@@ -2,7 +2,7 @@ version: '3'
 
 services:
   postgis:
-    image: postgis/postgis
+    image: postgis/postgis:13-3.1
     environment:
       POSTGRES_USER: test_user
       POSTGRES_PASSWORD: test_password
@@ -11,6 +11,11 @@ services:
         - "5432:5432"
     volumes:
       - postgis_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d 'user=test_user dbname=test_db host=postgis' " ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   ktor-service:
     image: vet-inpulse/eval-geolocation
@@ -19,7 +24,8 @@ services:
       POSTGRES_USER: test_user
       POSTGRES_PASSWORD: test_password
     depends_on:
-      - postgis
+      postgis:
+        condition: service_healthy
     ports:
       - "8081:8081"
 

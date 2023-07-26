@@ -23,7 +23,6 @@ import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.DockerImageName
 import vet.inpulse.geolocation.*
 import vet.inpulse.geolocation.server.*
-import vet.inpulse.geolocation.server.database.DatabaseConfig
 import vet.inpulse.geolocation.server.database.DatabaseFactory
 import java.util.Base64
 import java.util.UUID
@@ -63,7 +62,7 @@ class KtorServerTest {
     @BeforeEach
     fun setUp() {
         postgresSQLContainer.apply {
-            DatabaseFactory.init(DatabaseConfig(jdbcUrl, username, password))
+            DatabaseFactory.init()
         }
 
         engine = TestApplicationEngine()
