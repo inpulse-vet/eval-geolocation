@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  postgis:
+    image: postgis/postgis
+    environment:
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_password
+      POSTGRES_DB: test_db
+    ports:
+        - "5432:5432"
+    volumes:
+      - postgis_data:/var/lib/postgresql/data
+
+  ktor-service:
+    image: vet-inpulse/eval-geolocation
+    environment:
+      POSTGRES_URL: jdbc:postgresql://postgis:5432/test_db
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_password
+    depends_on:
+      - postgis
+    ports:
+      - "8081:8081"
+
+volumes:
+  postgis_data:
