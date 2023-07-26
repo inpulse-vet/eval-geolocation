@@ -13,9 +13,13 @@ object DatabaseFactory {
     private val configurationFile: Config = ConfigFactory.load()
 
     fun init(config: DatabaseConfig? = configurationFile.readFromProperties()) {
-        val databaseConfig = config ?: DatabaseConfig()
-        val dataSource = HikariDataSource(hikariConfiguration(databaseConfig))
+        val databaseConfig = config ?: DatabaseConfig(
+            System.getenv("POSTGRES_URL"),
+            System.getenv("POSTGRES_USER"),
+            System.getenv("POSTGRES_PASSWORD")
+        )
 
+        val dataSource = HikariDataSource(hikariConfiguration(databaseConfig))
         Database.connect(dataSource)
 
         transaction {
@@ -45,7 +49,7 @@ object DatabaseFactory {
 }
 
 data class DatabaseConfig(
-      val jdbcUrl: String = "jdbc:postgresql://localhost:5432/testDb",
-      val username: String = "testUser",
-      val password: String = "testPassword"
+      val jdbcUrl: String,
+      val username: String,
+      val password: String
 )

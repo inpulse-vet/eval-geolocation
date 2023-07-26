@@ -19,6 +19,7 @@ import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.Koin
 import vet.inpulse.geolocation.*
 import vet.inpulse.geolocation.server.data.PrincipalAuthentication
+import vet.inpulse.geolocation.server.database.DatabaseConfig
 import vet.inpulse.geolocation.server.database.DatabaseFactory
 import vet.inpulse.geolocation.server.processor.CSVDatabaseProcessor
 import vet.inpulse.geolocation.server.repository.RestaurantRepositoryImpl
@@ -39,13 +40,7 @@ fun Application.module() {
 }
 
 fun Application.configureDatabase() {
-    DatabaseFactory.init(
-        /* DatabaseConfig(
-               System.getenv("POSTGRES_URL"),
-               System.getenv("POSTGRES_USER"),
-               System.getenv("POSTGRES_PASSWORD")
-         )*/
-    )
+    DatabaseFactory.init()
 
     val processor by inject<CSVDatabaseProcessor>()
     runBlocking {
