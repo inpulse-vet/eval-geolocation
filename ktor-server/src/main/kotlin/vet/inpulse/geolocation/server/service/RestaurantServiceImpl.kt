@@ -11,6 +11,14 @@ class RestaurantServiceImpl(
 ): RestaurantService {
 
     @Throws(ApplicationException::class)
+    override suspend fun addNewRestaurants(restaurants: List<RestaurantDetails>) {
+        if (restaurants.isEmpty()) {
+            throw ApplicationException(error = Error.MALFORMED_DATA)
+        }
+        restaurantRepository.addNewRestaurants(restaurants)
+    }
+
+    @Throws(ApplicationException::class)
     override suspend fun addRestaurant(restaurantDetails: RestaurantDetails) {
         if (restaurantDetails.name.isEmpty() or restaurantDetails.streetAddress.isEmpty()) {
             throw ApplicationException(error = Error.MALFORMED_DATA)
