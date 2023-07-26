@@ -11,32 +11,46 @@ import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.koin.dsl.module
+import org.koin.ktor.ext.inject
+import org.koin.ktor.plugin.Koin
 import vet.inpulse.geolocation.*
 import vet.inpulse.geolocation.server.data.PrincipalAuthentication
-import vet.inpulse.geolocation.server.database.DatabaseConfig
 import vet.inpulse.geolocation.server.database.DatabaseFactory
-import vet.inpulse.geolocation.server.service.RestaurantServiceImpl
+import vet.inpulse.geolocation.server.processor.CSVDatabaseProcessor
 import vet.inpulse.geolocation.server.repository.RestaurantRepositoryImpl
+import vet.inpulse.geolocation.server.service.RestaurantServiceImpl
+import vet.inpulse.server.RestaurantService
 
 fun main() {
     embeddedServer(Netty, port = 8081, host = "0.0.0.0", module = Application::module).start(wait = true)
 }
 
 fun Application.module() {
-    DatabaseFactory.init(
-          DatabaseConfig(
-                System.getenv("POSTGRES_URL"),
-                System.getenv("POSTGRES_USER"),
-                System.getenv("POSTGRES_PASSWORD")
-          )
-    )
-
+    configureKoin()
+    configureDatabase()
     configureStatusPages()
     configureAuthentication()
     configureSerialization()
     configureRouting()
+}
+
+fun Application.configureDatabase() {
+    DatabaseFactory.init(
+        /* DatabaseConfig(
+               System.getenv("POSTGRES_URL"),
+               System.getenv("POSTGRES_USER"),
+               System.getenv("POSTGRES_PASSWORD")
+         )*/
+    )
+
+    val processor by inject<CSVDatabaseProcessor>()
+    runBlocking {
+        processor.processCSV()
+    }
 }
 
 fun Application.configureStatusPages() = install(StatusPages) {
@@ -48,6 +62,14 @@ fun Application.configureStatusPages() = install(StatusPages) {
         }
         call.respond(statusCode)
     }
+}
+
+fun Application.configureKoin() = install(Koin) {
+    val appModule = module {
+        single<RestaurantService> { RestaurantServiceImpl(RestaurantRepositoryImpl()) }
+        single { CSVDatabaseProcessor(get()) }
+    }
+    modules(appModule)
 }
 
 fun Application.configureSerialization() = install(ContentNegotiation) {
@@ -65,7 +87,7 @@ fun Application.configureAuthentication() = install(Authentication) {
 }
 
 fun Application.configureRouting() {
-    val restaurantService = RestaurantServiceImpl(RestaurantRepositoryImpl())
+    val restaurantService by inject<RestaurantService>()
 
     routing {
         get("/restaurants") {

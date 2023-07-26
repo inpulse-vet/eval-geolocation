@@ -43,7 +43,6 @@ Allegro,-27.6344386,-48.4716493,null,null,null,null
 Engenho do Vô,-27.6897276,-48.5096799,null,null,null,null
 Sol de Verão,-27.6906277,-48.5100260,null,null,null,null
 Flamel,-27.6100447,-48.5237713,null,null,null,null
-Miyoshi,-27.5390534,-48.5064548,null,null,null,null
 Boka's III,-27.5836969,-48.5818221,null,null,null,null
 Asahi,-27.5835779,-48.5820555,Rua Coronel Pedro Demoro,null,null,null
 Lucila,-27.4396827,-48.4867784,null,null,null,null
@@ -164,14 +163,13 @@ Flor de Sal,-27.5887096,-48.5765526,null,null,null,null
 Requinte,-27.5884152,-48.5765969,null,null,null,null
 Grelhados da Ilha,-27.5969454,-48.5485574,null,null,null,null
 Caçarola Grill,-27.5969953,-48.5484013,null,null,null,null
-Estilo,-27.5970058,-48.5483709,null,null,null,null
 Pizzaria Sta Edwiges,-27.7066553,-48.5087576,null,null,null,null
 Mercado Sahat,-27.6047540,-48.4658102,null,null,null,null
 null,-27.6045459,-48.4637005,null,null,null,null
 Espaço Nutrir,-27.6068101,-48.4669085,null,null,null,null
 La Bohème,-27.5956005,-48.5207404,null,null,null,null
 Duca,-27.6048244,-48.4658297,null,null,null,null
-Ponto X Pizzaria,-27.6739049,-48.4841355,null,null,null,We-Mo 18:30-00:00
+Ponto X Pizzaria,-27.6739049,-48.4841355,null,null,null,We-Mo 18:30-23:59
 Kia Ora,-27.6702066,-48.4824253,null,null,null,Mo-Su 10:00-22:00
 Piazza 8 Pizzeria,-27.6146567,-48.5870023,null,null,null,null
 Salve!,-27.5866067,-48.5508793,Travessa Harmonia,null,null,null
@@ -184,7 +182,7 @@ Chico Restaurante,-27.3896830,-48.4223605,null,null,null,null
 Restaurante Vó Velha,-27.6003409,-48.4995256,null,null,null,null
 Sushi Vibe,-27.6010402,-48.5052235,null,null,null,null
 Sushic Express,-27.5787048,-48.5104207,null,null,null,null
-ViPizza,-27.5958170,-48.5210093,Rua Lauro Linhares,null,null,Tu-Su 18:30-24:00
+ViPizza,-27.5958170,-48.5210093,Rua Lauro Linhares,null,null,Tu-Su 18:30-23:59
 Santo Kanto Restobar Floripa,-27.4254726,-48.4465221,Rua das Buganvílias,+55 48 3085-0382,null,Tu-Su 12:00-21:00
 Zeppelin,-27.5905090,-48.5114019,null,null,null,Mo-Sa 11:00-14:30; SuPH off
 Ichiro,-27.5909829,-48.5116716,null,null,null,null
@@ -203,12 +201,11 @@ Sabor & Mar,-27.7495788,-48.5049593,null,null,null,null
 Beirut,-27.5960804,-48.5534234,null,null,null,null
 Carne na Brasa,-27.5964701,-48.5540882,null,null,null,null
 Santo André Restaurante e Lanchonete,-27.5964063,-48.5542189,null,null,null,null
-Mirantes Grill,-27.5951171,-48.5507365,null,null,null,null
 Paladar,-27.5962882,-48.5515648,Rua Deodoro,null,null,null
 Kibe & Kebab,-27.5954644,-48.5544732,null,null,null,null
 Escritório na Praia,-27.7224555,-48.5635502,null,null,null,null
 Perello's,-27.7816475,-48.5084854,null,null,null,null
-Tea House Floripa Restaurante,-27.4230773,-48.4392162,Rua Flamboyants,+55 48 99907-8884,null,Mo-Su 09:00-24:00
+Tea House Floripa Restaurante,-27.4230773,-48.4392162,Rua Flamboyants,+55 48 99907-8884,null,Mo-Su 09:00-23:59
 Central,-27.5856175,-48.5470778,Rua Bocaiúva,null,null,null
 Espaço Nutrir Restaurante Vegano e Café,-27.6005652,-48.5128865,null,null,null,null
 Mané Gourmet,-27.5918889,-48.5429594,null,null,null,null
@@ -218,7 +215,6 @@ La Brasaria,-27.6665195,-48.4814985,null,+55 48 3207-3964,null,null
 Zahara,-27.6670174,-48.4814538,null,null,null,null
 Vibe Poke,-27.6666768,-48.4816077,null,+55 48 99174-3368,null,null
 Amazon Tastes,-27.6693522,-48.4793795,null,null,null,null
-O Tao,-27.6693202,-48.4793552,null,null,null,null
 Chega Mash Quiridu,-27.4631204,-48.3809544,null,null,null,null
 Assador,-27.5752833,-48.4248065,null,null,null,null
 Hitoshi,-27.6031002,-48.4710342,null,null,null,null

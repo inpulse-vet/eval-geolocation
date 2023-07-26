@@ -22,9 +22,7 @@ import org.slf4j.LoggerFactory
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.DockerImageName
 import vet.inpulse.geolocation.*
-import vet.inpulse.geolocation.server.configureAuthentication
-import vet.inpulse.geolocation.server.configureRouting
-import vet.inpulse.geolocation.server.configureSerialization
+import vet.inpulse.geolocation.server.*
 import vet.inpulse.geolocation.server.database.DatabaseConfig
 import vet.inpulse.geolocation.server.database.DatabaseFactory
 import java.util.Base64
@@ -72,6 +70,8 @@ class KtorServerTest {
         engine.start(wait = false)
 
         engine.application.apply {
+            configureKoin()
+            configureDatabase()
             configureSerialization()
             configureAuthentication()
             configureRouting()

@@ -11,11 +11,11 @@ object RestaurantTable : Table("restaurants") {
     val location = point("location")
     val streetAddress = varchar("street_address", 128)
 
-    val phone = varchar("phone", 15).nullable()
+    val phone = varchar("phone", 19).nullable()
     val website = varchar("website", 128).nullable()
 
-    val openingTime = varchar("opening_time", 256)
-    val closingTime = varchar("closing_time", 256)
+    val openingTime = varchar("opening_time", 256).nullable()
+    val closingTime = varchar("closing_time", 256).nullable()
 
     override val primaryKey = PrimaryKey(id)
 }

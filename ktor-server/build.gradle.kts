@@ -31,6 +31,14 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.2.9")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
 
+    val koinVersion = "3.4.0"
+
+    // Koin
+    implementation("io.insert-koin:koin-ktor:$koinVersion")
+
+    // CSV parsing
+    implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.9.1")
+
     val exposedVersion = "0.37.3"
 
     // database

@@ -54,15 +54,23 @@ fun ResultRow.toRestaurantDetails(restaurantId: UUID): RestaurantDetails {
     val rawLocation = this[RestaurantTable.location]
     val location = Location(Latitude(rawLocation.x.toFloat()), Longitude(rawLocation.y.toFloat()))
 
-    val closingTime = LocalTime.parse(this[RestaurantTable.closingTime])
-    val openingTime = LocalTime.parse(this[RestaurantTable.openingTime])
+    val openingTimeStr = this[RestaurantTable.openingTime]
+    val closingTimeStr = this[RestaurantTable.closingTime]
+
+    val openingTime = openingTimeStr?.let { LocalTime.parse(it) }
+    val closingTime = closingTimeStr?.let { LocalTime.parse(it) }
+
+    val openHours = if (openingTime != null && closingTime != null) {
+        OpenHours(openingTime, closingTime)
+    } else null
 
     return RestaurantDetails(
         restaurantId, this[RestaurantTable.name], location,
         this[RestaurantTable.streetAddress], this[RestaurantTable.phone],
-        this[RestaurantTable.website], OpenHours(openingTime, closingTime)
+        this[RestaurantTable.website], openHours
     )
 }
+
 
 fun Location.toPoint() = Point(this.longitude.value.toDouble(), this.latitude.value.toDouble())
 
