@@ -11,20 +11,25 @@ import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.jetbrains.exposed.sql.exposedLogger
 import org.koin.dsl.module
 import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.Koin
 import vet.inpulse.geolocation.*
 import vet.inpulse.geolocation.server.data.PrincipalAuthentication
-import vet.inpulse.geolocation.server.database.DatabaseConfig
+import vet.inpulse.geolocation.server.database.Configuration
 import vet.inpulse.geolocation.server.database.DatabaseFactory
 import vet.inpulse.geolocation.server.processor.CSVDatabaseProcessor
 import vet.inpulse.geolocation.server.repository.RestaurantRepositoryImpl
 import vet.inpulse.geolocation.server.service.RestaurantServiceImpl
+import vet.inpulse.server.RestaurantRepository
 import vet.inpulse.server.RestaurantService
+
+const val CSV_FILE = "restaurants.csv"
 
 fun main() {
     embeddedServer(Netty, port = 8081, host = "0.0.0.0", module = Application::module).start(wait = true)
@@ -40,11 +45,24 @@ fun Application.module() {
 }
 
 fun Application.configureDatabase() {
-    DatabaseFactory.init()
+    DatabaseFactory.init(
+        Configuration(
+            System.getenv("POSTGRES_URL"),
+            System.getenv("POSTGRES_USER"),
+            System.getenv("POSTGRES_PASSWORD")
+        )
+    )
 
-    val processor by inject<CSVDatabaseProcessor>()
-    runBlocking {
-        processor.processCSV()
+    val restaurantService by inject<RestaurantService>()
+
+    val resource = ClassLoader.getSystemResourceAsStream(CSV_FILE)
+    if (resource == null) {
+        exposedLogger.error("Could not load CSV file")
+        return
+    }
+
+    launch(Dispatchers.IO) {
+        restaurantService.loadDataFromCSV(resource)
     }
 }
 
@@ -61,8 +79,9 @@ fun Application.configureStatusPages() = install(StatusPages) {
 
 fun Application.configureKoin() = install(Koin) {
     val appModule = module {
-        single<RestaurantService> { RestaurantServiceImpl(RestaurantRepositoryImpl()) }
-        single { CSVDatabaseProcessor(get()) }
+        single<CSVDatabaseProcessor> { CSVDatabaseProcessor() }
+        single<RestaurantRepository> { RestaurantRepositoryImpl() }
+        single<RestaurantService> { RestaurantServiceImpl(get(), get()) }
     }
     modules(appModule)
 }

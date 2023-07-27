@@ -8,8 +8,8 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 object DatabaseFactory {
 
-    fun init() {
-        val dataSource = HikariDataSource(hikariConfiguration())
+    fun init(configuration: Configuration) {
+        val dataSource = HikariDataSource(hikariConfiguration(configuration))
         Database.connect(dataSource)
 
         transaction {
@@ -17,15 +17,27 @@ object DatabaseFactory {
         }
     }
 
-    private fun hikariConfiguration(): HikariConfig {
+    /*
+    System.getenv("POSTGRES_URL")
+    System.getenv("POSTGRES_USER")
+    System.getenv("POSTGRES_PASSWORD")
+     */
+
+    private fun hikariConfiguration(configuration: Configuration): HikariConfig {
         return HikariConfig().apply {
             driverClassName = "org.postgresql.Driver"
-            jdbcUrl = System.getenv("POSTGRES_URL")
-            username = System.getenv("POSTGRES_USER")
-            password = System.getenv("POSTGRES_PASSWORD")
+            jdbcUrl = configuration.url
+            username = configuration.user
+            password = configuration.password
             maximumPoolSize = 3
             isAutoCommit = false
             transactionIsolation = "TRANSACTION_REPEATABLE_READ"
         }
     }
 }
+
+data class Configuration(
+    val url: String,
+    val user: String,
+    val password: String
+)

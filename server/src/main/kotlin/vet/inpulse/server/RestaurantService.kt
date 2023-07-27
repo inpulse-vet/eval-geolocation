@@ -4,8 +4,16 @@ import vet.inpulse.geolocation.ApplicationException
 import vet.inpulse.geolocation.Location
 import vet.inpulse.geolocation.Restaurant
 import vet.inpulse.geolocation.RestaurantDetails
+import java.io.InputStream
 
 interface RestaurantService {
+
+    /**
+     * Loads data from a CSV file into the database.
+     *
+     * @param resource The CSV file to load.
+     */
+    suspend fun loadDataFromCSV(resource: InputStream)
 
     /**
      * Inserts a list of new restaurants into the database in a single transaction.

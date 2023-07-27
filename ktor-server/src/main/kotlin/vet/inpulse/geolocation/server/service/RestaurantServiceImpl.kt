@@ -1,14 +1,22 @@
 package vet.inpulse.geolocation.server.service
 
 import vet.inpulse.geolocation.*
+import vet.inpulse.geolocation.server.processor.CSVDatabaseProcessor
 import vet.inpulse.server.RestaurantRepository
 import vet.inpulse.server.RestaurantService
+import java.io.InputStream
 import java.lang.IllegalArgumentException
 import java.util.*
 
 class RestaurantServiceImpl(
-    private val restaurantRepository: RestaurantRepository
+    private val restaurantRepository: RestaurantRepository,
+    private val csvDatabaseProcessor: CSVDatabaseProcessor
 ): RestaurantService {
+
+    @Throws(ApplicationException::class)
+    override suspend fun loadDataFromCSV(resource: InputStream) {
+        restaurantRepository.addNewRestaurants(csvDatabaseProcessor.importFromCSV(resource))
+    }
 
     @Throws(ApplicationException::class)
     override suspend fun addNewRestaurants(restaurants: List<RestaurantDetails>) {
