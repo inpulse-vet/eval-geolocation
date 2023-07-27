@@ -23,6 +23,7 @@ import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.DockerImageName
 import vet.inpulse.geolocation.*
 import vet.inpulse.geolocation.server.*
+import vet.inpulse.geolocation.server.database.Configuration
 import vet.inpulse.geolocation.server.database.DatabaseFactory
 import java.util.Base64
 import java.util.UUID
@@ -34,13 +35,15 @@ class KtorServerTest {
     companion object {
         private val logger = LoggerFactory.getLogger(KtorServerTest::class.java)
 
-        val postgresSQLContainer = PostgreSQLContainer<Nothing>(DockerImageName.parse("postgis/postgis:13-3.1")
-              .asCompatibleSubstituteFor("postgres"))
-              .apply {
-                  withDatabaseName("testDb")
-                  withUsername("testUser")
-                  withPassword("testPassword")
-              }
+        val postgresSQLContainer = PostgreSQLContainer<Nothing>(
+            DockerImageName.parse("postgis/postgis:13-3.1")
+                .asCompatibleSubstituteFor("postgres")
+        )
+            .apply {
+                withDatabaseName("testDb")
+                withUsername("testUser")
+                withPassword("testPassword")
+            }
 
         val randomId: UUID = UUID.randomUUID()
 
@@ -62,7 +65,7 @@ class KtorServerTest {
     @BeforeEach
     fun setUp() {
         postgresSQLContainer.apply {
-            DatabaseFactory.init()
+            DatabaseFactory.init(Configuration(jdbcUrl, username, password))
         }
 
         engine = TestApplicationEngine()
@@ -85,16 +88,18 @@ class KtorServerTest {
     @Test
     fun insertRestaurant() {
         val restaurantDetails = RestaurantDetails(
-              randomId, "Test Restaurant",
-              Location(Latitude(34F), Longitude(34F)),
-              "Test Street Address", "Test Phone", "Test Website",
-              OpenHours(LocalTime(1, 0), LocalTime(5, 0))
+            randomId, "Test Restaurant",
+            Location(Latitude(34F), Longitude(34F)),
+            "Test Street Address", "Test Phone", "Test Website",
+            OpenHours(LocalTime(1, 0), LocalTime(5, 0))
         )
 
         val call = engine.handleRequest(HttpMethod.Post, "/restaurants") {
             addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-            addHeader(HttpHeaders.Authorization,
-                  "Basic ${Base64.getEncoder().encodeToString("user:password".toByteArray())}")
+            addHeader(
+                HttpHeaders.Authorization,
+                "Basic ${Base64.getEncoder().encodeToString("user:password".toByteArray())}"
+            )
             setBody(Json.encodeToJsonElement(restaurantDetails).toString())
         }
 
