@@ -59,8 +59,4 @@ class RestaurantServiceImpl(
         }
         return list
     }
-
-    override suspend fun checkDatabaseStatus(): Boolean {
-        return restaurantRepository.checkDatabaseStatus()
-    }
 }
