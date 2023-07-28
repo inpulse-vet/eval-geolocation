@@ -1,10 +1,8 @@
 package vet.inpulse.geolocation.server.processor
 
 import com.github.doyaaaaaken.kotlincsv.client.CsvReader
-import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalTime
 import vet.inpulse.geolocation.*
-import vet.inpulse.server.RestaurantService
 import java.io.InputStream
 import java.util.UUID
 

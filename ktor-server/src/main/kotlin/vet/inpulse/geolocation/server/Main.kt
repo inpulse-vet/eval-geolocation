@@ -23,6 +23,8 @@ import vet.inpulse.geolocation.*
 import vet.inpulse.geolocation.server.data.PrincipalAuthentication
 import vet.inpulse.geolocation.server.database.Configuration
 import vet.inpulse.geolocation.server.database.DatabaseFactory
+import vet.inpulse.geolocation.server.monitor.configureServerMonitoring
+import vet.inpulse.geolocation.server.monitor.getReadyRouting
 import vet.inpulse.geolocation.server.processor.CSVDatabaseProcessor
 import vet.inpulse.geolocation.server.repository.RestaurantRepositoryImpl
 import vet.inpulse.geolocation.server.service.RestaurantServiceImpl
@@ -39,13 +41,16 @@ fun Application.module() {
     configureKoin()
     configureDatabase()
     configureStatusPages()
+
     configureAuthentication()
+    configureServerMonitoring()
     configureSerialization()
     configureRouting()
 }
 
 fun Application.configureDatabase() {
-    DatabaseFactory.init(
+    val databaseFactory by inject<DatabaseFactory>()
+    databaseFactory.createDatabaseConnection(
         Configuration(
             System.getenv("POSTGRES_URL"),
             System.getenv("POSTGRES_USER"),
@@ -79,6 +84,7 @@ fun Application.configureStatusPages() = install(StatusPages) {
 
 fun Application.configureKoin() = install(Koin) {
     val appModule = module {
+        single<DatabaseFactory> { DatabaseFactory() }
         single<CSVDatabaseProcessor> { CSVDatabaseProcessor() }
         single<RestaurantRepository> { RestaurantRepositoryImpl() }
         single<RestaurantService> { RestaurantServiceImpl(get(), get()) }
@@ -104,6 +110,16 @@ fun Application.configureRouting() {
     val restaurantService by inject<RestaurantService>()
 
     routing {
+        getReadyRouting()
+
+        get("/health") {
+            val statusCode = if (restaurantService.checkDatabaseStatus()!!)
+                HttpStatusCode.OK
+            else HttpStatusCode.ServiceUnavailable
+
+            call.respond(statusCode)
+        }
+
         get("/restaurants") {
             val parameters = call.parameters
 

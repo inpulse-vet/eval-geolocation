@@ -37,4 +37,11 @@ interface RestaurantRepository {
      * @param batch The number of restaurants to return.
      */
     suspend fun getNearbyRestaurants(location: Location, batch: Int, maximumDistance: Double?): List<Restaurant>
+
+    /**
+     * Checks the status of the database.
+     *
+     * @return True if the database is running, false otherwise.
+     */
+    suspend fun checkDatabaseStatus(): Boolean
 }

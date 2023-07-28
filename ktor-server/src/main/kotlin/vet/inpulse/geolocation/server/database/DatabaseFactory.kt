@@ -6,22 +6,18 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 
-object DatabaseFactory {
+class DatabaseFactory {
 
-    fun init(configuration: Configuration) {
-        val dataSource = HikariDataSource(hikariConfiguration(configuration))
+    private lateinit var dataSource: HikariDataSource
+
+    fun createDatabaseConnection(configuration: Configuration) {
+        dataSource = HikariDataSource(hikariConfiguration(configuration))
         Database.connect(dataSource)
 
         transaction {
             SchemaUtils.create(RestaurantTable)
         }
     }
-
-    /*
-    System.getenv("POSTGRES_URL")
-    System.getenv("POSTGRES_USER")
-    System.getenv("POSTGRES_PASSWORD")
-     */
 
     private fun hikariConfiguration(configuration: Configuration): HikariConfig {
         return HikariConfig().apply {
@@ -30,6 +26,7 @@ object DatabaseFactory {
             username = configuration.user
             password = configuration.password
             maximumPoolSize = 3
+            connectionTimeout = 1000
             isAutoCommit = false
             transactionIsolation = "TRANSACTION_REPEATABLE_READ"
         }

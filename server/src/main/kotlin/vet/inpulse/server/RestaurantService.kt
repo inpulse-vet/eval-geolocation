@@ -13,6 +13,7 @@ interface RestaurantService {
      *
      * @param resource The CSV file to load.
      */
+    @Throws(ApplicationException::class)
     suspend fun loadDataFromCSV(resource: InputStream)
 
     /**
@@ -20,6 +21,7 @@ interface RestaurantService {
      *
      * @param restaurants The list of [RestaurantDetails] objects to be inserted.
      */
+    @Throws(ApplicationException::class)
     suspend fun addNewRestaurants(restaurants: List<RestaurantDetails>)
 
     /**
@@ -51,4 +53,11 @@ interface RestaurantService {
      */
     @Throws(ApplicationException::class)
     suspend fun getNearbyRestaurants(location: Location, batch: Int, maximumDistance: Double?): List<Restaurant>
+
+    /**
+     * Checks the status of the database.
+     *
+     * @return True if the database is running, false otherwise.
+     */
+    suspend fun checkDatabaseStatus(): Boolean
 }
