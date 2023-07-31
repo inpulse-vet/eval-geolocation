@@ -31,28 +31,28 @@ val MonitoringPlugin = createApplicationPlugin(name = "MonitoringPlugin", create
         availabilityState.set(AvailabilityState.GRACEFUL_SHUTDOWN)
     }
 
+    this.application.routing {
+        authenticate("auth-basic") {
+            get("/health") {
+                try {
+                    checkHealthAction.invoke()
+                    call.respond(HttpStatusCode.OK, "Database is available")
+                } catch(exception: Exception) {
+                    call.respond(HttpStatusCode.ServiceUnavailable, "Database is not available")
+                }
+            }
+
+            get("/ready") {
+                val rawCode = availabilityState.get()
+                call.respond(HttpStatusCode.fromValue(rawCode.readinessCode), rawCode.toString())
+            }
+        }
+    }
+
     application.intercept(ApplicationCallPipeline.Call) {
         if (availabilityState.get() == AvailabilityState.GRACEFUL_SHUTDOWN) {
             call.respond(HttpStatusCode.ServiceUnavailable, "Server stopping")
             finish()
-        }
-
-        this.application.routing {
-            authenticate("auth-basic") {
-                get("/health") {
-                    try {
-                        checkHealthAction.invoke()
-                        call.respond(HttpStatusCode.OK, "Database is available")
-                    } catch(exception: Exception) {
-                        call.respond(HttpStatusCode.ServiceUnavailable, "Database is not available")
-                    }
-                }
-
-                get("/ready") {
-                    val rawCode = availabilityState.get()
-                    call.respond(HttpStatusCode.fromValue(rawCode.readinessCode), rawCode.toString())
-                }
-            }
         }
     }
 }
