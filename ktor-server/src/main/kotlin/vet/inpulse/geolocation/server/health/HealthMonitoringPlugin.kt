@@ -6,31 +6,34 @@ import io.ktor.server.application.hooks.*
 import io.ktor.server.auth.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import org.koin.ktor.ext.getKoin
 import vet.inpulse.server.health.AvailabilityState
-import vet.inpulse.server.health.HealthController
+import java.util.concurrent.atomic.AtomicReference
 
-val MonitoringPlugin = createApplicationPlugin(name = "MonitoringPlugin") {
-    val healthController = application.getKoin().get<HealthController>()
+private val availabilityState = AtomicReference(AvailabilityState.STARTING)
+
+class PluginConfiguration(var checkHealthAction: (suspend () -> Boolean?) = { false })
+
+val MonitoringPlugin = createApplicationPlugin(name = "MonitoringPlugin", createConfiguration = ::PluginConfiguration) {
+    val checkHealthAction = pluginConfig.checkHealthAction
 
     on(MonitoringEvent(ApplicationStarting)) {
-        healthController.setAvailabilityState(AvailabilityState.STARTING)
+        availabilityState.set(AvailabilityState.STARTING)
     }
 
     on(MonitoringEvent(ApplicationStarted)) {
-        healthController.setAvailabilityState(AvailabilityState.STARTED)
+        availabilityState.set(AvailabilityState.STARTED)
     }
 
     on(MonitoringEvent(ServerReady)) {
-        healthController.setAvailabilityState(AvailabilityState.READY)
+        availabilityState.set(AvailabilityState.READY)
     }
 
     on(MonitoringEvent(ApplicationStopPreparing)) {
-        healthController.setAvailabilityState(AvailabilityState.GRACEFUL_SHUTDOWN)
+        availabilityState.set(AvailabilityState.GRACEFUL_SHUTDOWN)
     }
 
     application.intercept(ApplicationCallPipeline.Call) {
-        if (healthController.getAvailabilityState() == AvailabilityState.GRACEFUL_SHUTDOWN) {
+        if (availabilityState.get() == AvailabilityState.GRACEFUL_SHUTDOWN) {
             call.respond(HttpStatusCode.ServiceUnavailable, "Server stopping")
             finish()
         }
@@ -38,13 +41,17 @@ val MonitoringPlugin = createApplicationPlugin(name = "MonitoringPlugin") {
         this.application.routing {
             authenticate("auth-basic") {
                 get("/health") {
-                    val rawCode = healthController.getCurrentHealthCode()
-                    call.respond(HttpStatusCode.fromValue(rawCode))
+                    try {
+                        checkHealthAction.invoke()
+                        call.respond(HttpStatusCode.OK, "Database is available")
+                    } catch(exception: Exception) {
+                        call.respond(HttpStatusCode.ServiceUnavailable, "Database is not available")
+                    }
                 }
 
                 get("/ready") {
-                    val rawCode = healthController.getCurrentReadinessCode()
-                    call.respond(rawCode)
+                    val rawCode = availabilityState.get()
+                    call.respond(HttpStatusCode.fromValue(rawCode.readinessCode), rawCode.toString())
                 }
             }
         }

@@ -12,6 +12,7 @@ import io.ktor.server.response.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.exposed.sql.exposedLogger
+import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.dsl.module
 import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.Koin
@@ -19,16 +20,12 @@ import vet.inpulse.geolocation.*
 import vet.inpulse.geolocation.server.data.PrincipalAuthentication
 import vet.inpulse.geolocation.server.database.Configuration
 import vet.inpulse.geolocation.server.database.DatabaseFactory
-import vet.inpulse.geolocation.server.health.DatabaseHealthRepositoryImpl
-import vet.inpulse.geolocation.server.health.HealthControllerImpl
 import vet.inpulse.geolocation.server.health.MonitoringPlugin
 import vet.inpulse.geolocation.server.processor.CSVDatabaseProcessor
 import vet.inpulse.geolocation.server.repository.RestaurantRepositoryImpl
 import vet.inpulse.geolocation.server.service.RestaurantServiceImpl
 import vet.inpulse.server.RestaurantRepository
 import vet.inpulse.server.RestaurantService
-import vet.inpulse.server.health.DatabaseHealthRepository
-import vet.inpulse.server.health.HealthController
 
 const val CSV_FILE = "restaurants.csv"
 
@@ -47,7 +44,13 @@ fun Application.module() {
     configureRouting()
 }
 
-fun Application.configureMonitoringPlugin() = install(MonitoringPlugin)
+fun Application.configureMonitoringPlugin() = install(MonitoringPlugin) {
+    checkHealthAction = {
+        transaction {
+            exec("SELECT 1") { it.next() }
+        }
+    }
+}
 
 fun Application.configureDatabase() {
     val databaseFactory by inject<DatabaseFactory>()
@@ -90,9 +93,6 @@ fun Application.configureKoin() = install(Koin) {
 
         single<RestaurantRepository> { RestaurantRepositoryImpl() }
         single<RestaurantService> { RestaurantServiceImpl(get(), get()) }
-
-        single<DatabaseHealthRepository> { DatabaseHealthRepositoryImpl() }
-        single<HealthController> { HealthControllerImpl(get()) }
     }
     modules(appModule)
 }

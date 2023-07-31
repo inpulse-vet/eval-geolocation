@@ -65,7 +65,7 @@ class KtorServerTest {
     @BeforeEach
     fun setUp() {
         postgresSQLContainer.apply {
-            DatabaseFactory.init(Configuration(jdbcUrl, username, password))
+            DatabaseFactory().createDatabaseConnection(Configuration(jdbcUrl, username, password))
         }
 
         engine = TestApplicationEngine()
@@ -78,6 +78,7 @@ class KtorServerTest {
             configureAuthentication()
             configureRouting()
         }
+
     }
 
     @AfterEach
