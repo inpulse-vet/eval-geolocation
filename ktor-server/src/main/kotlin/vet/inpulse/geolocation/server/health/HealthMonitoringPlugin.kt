@@ -6,7 +6,6 @@ import io.ktor.server.application.hooks.*
 import io.ktor.server.auth.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import vet.inpulse.server.health.AvailabilityState
 import java.util.concurrent.atomic.AtomicReference
 
 private val availabilityState = AtomicReference(AvailabilityState.STARTING)
@@ -56,4 +55,11 @@ val MonitoringPlugin = createApplicationPlugin(name = "MonitoringPlugin", create
             }
         }
     }
+}
+
+enum class AvailabilityState(val readinessCode: Int) {
+    STARTING(503),
+    STARTED(503),
+    READY(200),
+    GRACEFUL_SHUTDOWN(503),
 }
