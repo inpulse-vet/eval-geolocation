@@ -32,7 +32,6 @@ class CSVDatabaseProcessor {
 
     private fun parseRestaurantDetails(map: Map<String, String>): RestaurantDetails? {
         val name = map["name"] ?: return null
-        println(name)
         if (name == "null") return null
 
         val id = UUID.nameUUIDFromBytes(name.toByteArray())
@@ -41,6 +40,8 @@ class CSVDatabaseProcessor {
         val streetAddress = map["addr:street"] ?: return null
 
         val phone = map["contact:phone"]
+        if (phone!!.length > 19) return null
+
         val website = map["contact:website"]
         val openHours = parseOpenHours(map)
 
@@ -58,7 +59,9 @@ class CSVDatabaseProcessor {
         val openHours = map["opening_hours"] ?: return null
         val matchResult = hourPattern.find(openHours) ?: return null
 
-        val (openingTime, closingTime) = matchResult.destructured
+        var (openingTime, closingTime) = matchResult.destructured
+        if (closingTime == "00:00" || closingTime >= "00:00") closingTime = "23:59";
+
         return OpenHours(LocalTime.parse(openingTime), LocalTime.parse(closingTime))
     }
 }
