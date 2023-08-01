@@ -4,7 +4,6 @@ import vet.inpulse.geolocation.*
 import vet.inpulse.geolocation.server.processor.CSVDatabaseProcessor
 import vet.inpulse.server.RestaurantRepository
 import vet.inpulse.server.RestaurantService
-import java.io.InputStream
 import java.lang.IllegalArgumentException
 import java.util.*
 
@@ -14,8 +13,8 @@ class RestaurantServiceImpl(
 ): RestaurantService {
 
     @Throws(ApplicationException::class)
-    override suspend fun loadDataFromCSV(resource: InputStream) {
-        restaurantRepository.addNewRestaurants(csvDatabaseProcessor.importFromCSV(resource))
+    override suspend fun loadDataFromCSVFolder(folder: String) {
+        restaurantRepository.addNewRestaurants(csvDatabaseProcessor.importFromCSV(folder))
     }
 
     @Throws(ApplicationException::class)

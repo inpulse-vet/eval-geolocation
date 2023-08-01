@@ -3,19 +3,36 @@ package vet.inpulse.geolocation.server.processor
 import com.github.doyaaaaaken.kotlincsv.client.CsvReader
 import kotlinx.datetime.LocalTime
 import vet.inpulse.geolocation.*
-import java.io.InputStream
+import java.io.File
 import java.util.UUID
 
 class CSVDatabaseProcessor {
 
     private val hourPattern = """(\d{2}:\d{2})-(\d{2}:\d{2})""".toRegex()
 
-    fun importFromCSV(resource: InputStream): List<RestaurantDetails> {
-        return CsvReader().readAllWithHeader(resource).mapNotNull { parseRestaurantDetails(it) }
+    fun importFromCSV(folder: String): List<RestaurantDetails> {
+        val directory = File(folder)
+        if (!directory.exists() or !directory.isDirectory) {
+            throw IllegalArgumentException("$folder directory does not exist")
+        }
+
+        return directory.walk()
+            .filter { it.isFile && it.extension == "csv" }
+            .flatMap { it.readFileAsRestaurantList() }
+            .toList()
+    }
+
+    private fun File.readFileAsRestaurantList(): List<RestaurantDetails> {
+        return inputStream().use { inputStream ->
+            CsvReader().readAllWithHeader(inputStream)
+                .mapNotNull { parseRestaurantDetails(it)
+            }
+        }
     }
 
     private fun parseRestaurantDetails(map: Map<String, String>): RestaurantDetails? {
         val name = map["name"] ?: return null
+        println(name)
         if (name == "null") return null
 
         val id = UUID.nameUUIDFromBytes(name.toByteArray())

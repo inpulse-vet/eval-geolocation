@@ -11,7 +11,6 @@ import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.jetbrains.exposed.sql.exposedLogger
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.dsl.module
 import org.koin.ktor.ext.inject
@@ -27,7 +26,7 @@ import vet.inpulse.geolocation.server.service.RestaurantServiceImpl
 import vet.inpulse.server.RestaurantRepository
 import vet.inpulse.server.RestaurantService
 
-const val CSV_FILE = "restaurants.csv"
+const val CSV_FOLDER = "restaurants"
 
 fun main() {
     embeddedServer(Netty, port = 8081, host = "0.0.0.0", module = Application::module).start(wait = true)
@@ -35,11 +34,11 @@ fun main() {
 
 fun Application.module() {
     configureKoin()
-    configureMonitoringPlugin()
     configureDatabase()
     configureStatusPages()
-
     configureAuthentication()
+
+    configureMonitoringPlugin()
     configureSerialization()
     configureRouting()
 }
@@ -56,22 +55,21 @@ fun Application.configureDatabase() {
     val databaseFactory by inject<DatabaseFactory>()
     databaseFactory.createDatabaseConnection(
         Configuration(
-            System.getenv("POSTGRES_URL"),
+            /*System.getenv("POSTGRES_URL"),
             System.getenv("POSTGRES_USER"),
-            System.getenv("POSTGRES_PASSWORD")
+            System.getenv("POSTGRES_PASSWORD")*/
+            "jdbc:postgresql://localhost:5432/testDb",
+            "testUser",
+            "testPassword"
         )
     )
 
     val restaurantService by inject<RestaurantService>()
 
-    val resource = ClassLoader.getSystemResourceAsStream(CSV_FILE)
-    if (resource == null) {
-        exposedLogger.error("Could not load CSV file")
-        return
-    }
-
     launch(Dispatchers.IO) {
-        restaurantService.loadDataFromCSV(resource)
+        this::class.java.getResource("/$CSV_FOLDER")?.path?.let {
+            restaurantService.loadDataFromCSVFolder(it)
+        }
     }
 }
 
