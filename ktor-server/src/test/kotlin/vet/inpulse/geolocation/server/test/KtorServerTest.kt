@@ -17,6 +17,12 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.openjdk.jmh.annotations.Benchmark
+import org.openjdk.jmh.annotations.BenchmarkMode
+import org.openjdk.jmh.annotations.Mode
+import org.openjdk.jmh.annotations.OutputTimeUnit
+import org.openjdk.jmh.runner.Runner
+import org.openjdk.jmh.runner.options.OptionsBuilder
 import org.slf4j.LoggerFactory
 
 import org.testcontainers.containers.PostgreSQLContainer
@@ -27,10 +33,11 @@ import vet.inpulse.geolocation.server.database.Configuration
 import vet.inpulse.geolocation.server.database.DatabaseFactory
 import java.util.Base64
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 import kotlin.test.assertNotNull
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-class KtorServerTest {
+open class KtorServerTest {
 
     companion object {
         private val logger = LoggerFactory.getLogger(KtorServerTest::class.java)

@@ -2,6 +2,7 @@ plugins {
     kotlin("jvm") version "1.8.10"
     kotlin("plugin.serialization") version "1.8.10"
     id("com.google.cloud.tools.jib") version "3.3.2"
+    id("me.champeau.jmh") version "0.6.8"
     java
 }
 
@@ -18,6 +19,9 @@ tasks.test {
 
 dependencies {
     implementation(project(":server"))
+    implementation("io.ktor:ktor-client-apache:2.3.1")
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.1")
+    implementation("io.ktor:ktor-serialization-jackson:2.3.1")
 
     val ktorVersion = "2.3.1"
 
@@ -32,6 +36,14 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
 
     val koinVersion = "3.4.0"
+
+    // benchmark
+    jmh("org.openjdk.jmh:jmh-core:1.36")
+    jmh("org.openjdk.jmh:jmh-generator-annprocess:1.36")
+
+    testImplementation("org.openjdk.jmh:jmh-generator-annprocess:1.36")
+
+    jmhAnnotationProcessor("org.openjdk.jmh:jmh-generator-annprocess:1.36")
 
     // Koin
     implementation("io.insert-koin:koin-ktor:$koinVersion")
@@ -57,6 +69,10 @@ dependencies {
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
 
     testImplementation(kotlin("test"))
+}
+
+jmh {
+    version = "1.36"
 }
 
 jib {
