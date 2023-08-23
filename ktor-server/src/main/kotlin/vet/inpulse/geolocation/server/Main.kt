@@ -53,14 +53,12 @@ fun Application.configureMonitoringPlugin() = install(MonitoringPlugin) {
 
 fun Application.configureDatabase() {
     val databaseFactory by inject<DatabaseFactory>()
+    val envVars = System.getenv()
     databaseFactory.createDatabaseConnection(
         Configuration(
-            /*System.getenv("POSTGRES_URL"),
-            System.getenv("POSTGRES_USER"),
-            System.getenv("POSTGRES_PASSWORD")*/
-            "jdbc:postgresql://localhost:5432/testDb",
-            "testUser",
-            "testPassword"
+            url = envVars["POSTGRES_URL"] ?: "jdbc:postgresql://localhost:5432/testDb",
+            user = envVars["POSTGRES_USER"] ?: "testUser",
+            password = envVars["POSTGRES_PASSWORD"] ?: "testPassword",
         )
     )
 
