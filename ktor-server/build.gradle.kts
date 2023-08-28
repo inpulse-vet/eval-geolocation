@@ -6,8 +6,8 @@ plugins {
     java
 }
 
-group = "vet.inpulse.geolocation"
-version = "0.0.1"
+group = "vet.inpulse"
+version = "0.0.2"
 
 kotlin {
     jvmToolchain(17)
@@ -71,18 +71,13 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 
-jmh {
-    version = "1.36"
-}
-
 jib {
     from {
         image = "openjdk:17-alpine"
     }
 
     to {
-        image = "vet-inpulse/eval-geolocation"
-        tags = setOf("latest")
+        image = "registry.incloud.vet/${project.group}/geolocation:${project.version}"
     }
 
     container {

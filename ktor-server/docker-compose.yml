@@ -17,8 +17,8 @@ services:
       timeout: 5s
       retries: 5
 
-  ktor-service:
-    image: vet-inpulse/eval-geolocation
+  geolocation:
+    image: registry.incloud.vet/vet.inpulse/geolocation:0.0.2
     environment:
       POSTGRES_URL: jdbc:postgresql://postgis:5432/test_db
       POSTGRES_USER: test_user
