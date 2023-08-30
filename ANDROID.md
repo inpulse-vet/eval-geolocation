@@ -40,3 +40,5 @@ Prerequisites:
 1. Run `build-docker.ps1` if using PowerShell on Windows or `build-docker.sh` if running on Linux or macOS
 This should build the project and deploy the image onto the local Docker daemon.
 2. Run `docker compose up -d` on the terminal. This will prepare the database and run the backend service.
+
+Server will be available on `http://localhost:8081/`.
