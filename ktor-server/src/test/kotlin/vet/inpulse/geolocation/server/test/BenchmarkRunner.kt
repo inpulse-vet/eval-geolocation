@@ -17,7 +17,7 @@ open class BenchmarkRunner {
     fun runServiceBenchMark(blackhole: Blackhole) {
         val benchmark = vet.inpulse.geolocation.server.test.Benchmark()
         benchmark.setup()
-        benchmark.endpointBenchmark(blackhole)
+        benchmark.locationBenchmark(blackhole)
         benchmark.teardown()
     }
 }
