@@ -35,6 +35,10 @@ import java.util.Base64
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertNotNull
+import org.koin.core.context.loadKoinModules
+import org.koin.dsl.bind
+import org.koin.dsl.module
+import vet.inpulse.geolocation.server.database.DatabaseConfigurationLoader
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 open class KtorServerTest {
@@ -43,7 +47,7 @@ open class KtorServerTest {
         private val logger = LoggerFactory.getLogger(KtorServerTest::class.java)
 
         val postgresSQLContainer = PostgreSQLContainer<Nothing>(
-            DockerImageName.parse("postgis/postgis:13-3.1")
+            DockerImageName.parse("postgis/postgis:15-3.4")
                 .asCompatibleSubstituteFor("postgres")
         )
             .apply {
@@ -71,15 +75,27 @@ open class KtorServerTest {
 
     @BeforeEach
     fun setUp() {
-        postgresSQLContainer.apply {
-            DatabaseFactory().createDatabaseConnection(Configuration(jdbcUrl, username, password))
+        val configLoader = object : DatabaseConfigurationLoader {
+            override fun loadConfiguration(): Configuration {
+                return Configuration(
+                    postgresSQLContainer.jdbcUrl,
+                    postgresSQLContainer.username,
+                    postgresSQLContainer.password
+                )
+            }
+        }
+
+        val testModule = module {
+            single { configLoader }.bind<DatabaseConfigurationLoader>()
         }
 
         engine = TestApplicationEngine()
         engine.start(wait = false)
 
         engine.application.apply {
-            configureKoin()
+            configureKoin().apply {
+                loadKoinModules(testModule)
+            }
             configureDatabase()
             configureSerialization()
             configureAuthentication()

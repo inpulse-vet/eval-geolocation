@@ -1,0 +1,27 @@
+version: "3.9"
+services:
+    database:
+        image: postgis/postgis:15-3.4
+        container_name: geolocation-db
+        healthcheck:
+            test: [ "CMD-SHELL", "pg_isready -d geolocation -U geolocation-user" ]
+            interval: 2s
+            timeout: 2s
+            retries: 10
+        environment:
+            POSTGRES_DB: geolocation
+            POSTGRES_USER: geolocation-user
+            POSTGRES_PASSWORD: geolocation-password
+
+    backend:
+        image: registry.incloud.vet/vet.inpulse/geolocation:0.0.3
+        container_name: geolocation-backend
+        depends_on:
+            database:
+                condition: service_healthy
+        ports:
+            - 8081:8081
+        environment:
+            POSTGRES_URL: jdbc:postgresql://geolocation-db:5432/geolocation
+            POSTGRES_USER: geolocation-user
+            POSTGRES_PASSWORD: geolocation-password

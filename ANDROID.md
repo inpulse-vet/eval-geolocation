@@ -30,3 +30,13 @@ Bonus points if: (In descending order of priority but in ascending order of diff
 * App handles screen size differences.
 * App handles landscape orientation.
 * App offers offline-first experience.
+
+#### How to run test server
+Prerequisites: 
+* Have docker running
+    - Docker Desktop on Windows and macOS 
+    - Regular docker on Linux
+
+1. Run `build-docker.ps1` if using PowerShell on Windows or `build-docker.sh` if running on Linux or macOS
+This should build the project and deploy the image onto the local Docker daemon.
+2. Run `docker compose up -d` on the terminal. This will prepare the database and run the backend service.

@@ -8,6 +8,11 @@ import java.util.*
 interface RestaurantRepository {
 
     /**
+     * Returns the total amount of restaurants in the database.
+     */
+    suspend fun getTotalNumberOfRestaurants(): Long
+
+    /**
      * Inserts a list of new restaurants into the database in a single transaction.
      *
      * @param restaurants The list of [RestaurantDetails] objects to be inserted.

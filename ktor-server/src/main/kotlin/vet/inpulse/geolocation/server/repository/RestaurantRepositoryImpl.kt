@@ -10,10 +10,13 @@ import vet.inpulse.server.RestaurantRepository
 import java.util.*
 
 class RestaurantRepositoryImpl: RestaurantRepository {
+    override suspend fun getTotalNumberOfRestaurants(): Long {
+        return newSuspendedTransaction { RestaurantTable.selectAll().count() }
+    }
 
     override suspend fun addNewRestaurants(restaurants: List<RestaurantDetails>) {
         newSuspendedTransaction {
-            RestaurantTable.batchInsert(restaurants, ignore = true) {
+            RestaurantTable.batchInsert(restaurants, ignore = true, shouldReturnGeneratedValues = false) {
                 parseBatch(it)
             }
         }

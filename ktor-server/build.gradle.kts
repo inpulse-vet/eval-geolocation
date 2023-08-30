@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "vet.inpulse"
-version = "0.0.2"
+version = "0.0.3"
 
 kotlin {
     jvmToolchain(17)
@@ -19,12 +19,8 @@ tasks.test {
 
 dependencies {
     implementation(project(":server"))
-    implementation("io.ktor:ktor-client-apache:2.3.1")
-    implementation("io.ktor:ktor-client-content-negotiation:2.3.1")
-    implementation("io.ktor:ktor-serialization-jackson:2.3.1")
 
-    val ktorVersion = "2.3.1"
-
+    val ktorVersion = "2.3.3"
     implementation("io.ktor:ktor-server-core:$ktorVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-server-auth:$ktorVersion")
@@ -32,7 +28,7 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
 
-    implementation("ch.qos.logback:logback-classic:1.2.9")
+    implementation("ch.qos.logback:logback-classic:1.4.8")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
 
     val koinVersion = "3.4.0"

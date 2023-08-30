@@ -12,13 +12,16 @@ import io.ktor.server.response.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.koin.dsl.bind
 import org.koin.dsl.module
 import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.Koin
 import vet.inpulse.geolocation.*
 import vet.inpulse.geolocation.server.data.PrincipalAuthentication
 import vet.inpulse.geolocation.server.database.Configuration
+import vet.inpulse.geolocation.server.database.DatabaseConfigurationLoader
 import vet.inpulse.geolocation.server.database.DatabaseFactory
+import vet.inpulse.geolocation.server.database.EnvVarDatabaseConfigurationLoader
 import vet.inpulse.geolocation.server.health.MonitoringPlugin
 import vet.inpulse.geolocation.server.processor.CSVDatabaseProcessor
 import vet.inpulse.geolocation.server.repository.RestaurantRepositoryImpl
@@ -53,14 +56,9 @@ fun Application.configureMonitoringPlugin() = install(MonitoringPlugin) {
 
 fun Application.configureDatabase() {
     val databaseFactory by inject<DatabaseFactory>()
-    val envVars = System.getenv()
-    databaseFactory.createDatabaseConnection(
-        Configuration(
-            url = envVars["POSTGRES_URL"] ?: "jdbc:postgresql://localhost:5432/testDb",
-            user = envVars["POSTGRES_USER"] ?: "testUser",
-            password = envVars["POSTGRES_PASSWORD"] ?: "testPassword",
-        )
-    )
+    val configurationLoader by inject<DatabaseConfigurationLoader>()
+    val configuration = configurationLoader.loadConfiguration()
+    databaseFactory.createDatabaseConnection(configuration)
 
     val restaurantService by inject<RestaurantService>()
 
@@ -84,6 +82,7 @@ fun Application.configureStatusPages() = install(StatusPages) {
 
 fun Application.configureKoin() = install(Koin) {
     val appModule = module {
+        single { EnvVarDatabaseConfigurationLoader() }.bind<DatabaseConfigurationLoader>()
         single<DatabaseFactory> { DatabaseFactory() }
         single<CSVDatabaseProcessor> { CSVDatabaseProcessor() }
 

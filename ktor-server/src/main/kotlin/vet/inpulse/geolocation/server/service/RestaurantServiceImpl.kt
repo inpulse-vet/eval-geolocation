@@ -6,15 +6,32 @@ import vet.inpulse.server.RestaurantRepository
 import vet.inpulse.server.RestaurantService
 import java.lang.IllegalArgumentException
 import java.util.*
+import kotlin.math.log
+import kotlin.time.measureTime
+import kotlin.time.measureTimedValue
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class RestaurantServiceImpl(
     private val restaurantRepository: RestaurantRepository,
     private val csvDatabaseProcessor: CSVDatabaseProcessor
 ): RestaurantService {
 
+    private val logger = LoggerFactory.getLogger(this::class.java)
+
     @Throws(ApplicationException::class)
     override suspend fun loadDataFromCSVFolder(folder: String) {
-        restaurantRepository.addNewRestaurants(csvDatabaseProcessor.importFromCSV(folder))
+        logger.info("Check if we need to import restaurants from CSV.")
+        val totalBefore = restaurantRepository.getTotalNumberOfRestaurants()
+        if (totalBefore < 100153 /* hardcode number for now */) {
+            val time = measureTime {
+                restaurantRepository.addNewRestaurants(csvDatabaseProcessor.importFromCSV(folder))
+            }
+            val totalAfter = restaurantRepository.getTotalNumberOfRestaurants()
+            logger.info("Imported $totalAfter restaurants from CSV in $time")
+        } else {
+            logger.info("Restaurants in database: $totalBefore.")
+        }
     }
 
     @Throws(ApplicationException::class)

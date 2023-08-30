@@ -29,6 +29,7 @@ class DatabaseFactory {
             connectionTimeout = 1000
             isAutoCommit = false
             transactionIsolation = "TRANSACTION_REPEATABLE_READ"
+            addDataSourceProperty("reWriteBatchedInserts", "true")
         }
     }
 }
@@ -38,3 +39,19 @@ data class Configuration(
     val user: String,
     val password: String
 )
+
+interface DatabaseConfigurationLoader {
+    fun loadConfiguration(): Configuration
+}
+
+class EnvVarDatabaseConfigurationLoader() : DatabaseConfigurationLoader{
+    override fun loadConfiguration(): Configuration {
+        val envVars = System.getenv()
+        return Configuration(
+            url = envVars["POSTGRES_URL"] ?: "jdbc:postgresql://localhost:5432/testDb",
+            user = envVars["POSTGRES_USER"] ?: "testUser",
+            password = envVars["POSTGRES_PASSWORD"] ?: "testPassword",
+        )
+    }
+
+}
